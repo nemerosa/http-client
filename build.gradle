@@ -27,7 +27,7 @@ allprojects {
  */
 
 ext {
-    httpClientVersion = '4.3.4'
+    httpClientVersion = '4.5'
     slf4jVersion = '1.7.12'
     libraries = [
             commons_lang3   : 'org.apache.commons:commons-lang3:3.3.2',

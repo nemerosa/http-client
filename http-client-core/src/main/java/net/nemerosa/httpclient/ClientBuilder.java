@@ -12,6 +12,7 @@ import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.*;
@@ -123,7 +124,7 @@ public class ClientBuilder {
 
             sslSocketFactory = new SSLConnectionSocketFactory(
                     ctx,
-                    SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER
+                    NoopHostnameVerifier.INSTANCE
             );
         } else {
             logger.debug("Using default secure SSL socket factory.");
