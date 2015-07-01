@@ -1,0 +1,7 @@
+description = "Wrapper on top of the Apache HTTP Client to provide high level methods with JSON"
+
+dependencies {
+    compile project(':http-client-core')
+    compile libraries.jackson_databind
+    compile libraries.lombok
+}
