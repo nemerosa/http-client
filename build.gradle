@@ -33,6 +33,7 @@ ext {
             lombok          : 'org.projectlombok:lombok:1.16.4',
             junit           : 'junit:junit:4.11',
             http_client     : "org.apache.httpcomponents:httpclient:${httpClientVersion}",
+            slf4j_api       : "org.slf4j:slf4j-api:${slf4jVersion}",
     ]
 }
 
