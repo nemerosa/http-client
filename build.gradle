@@ -27,10 +27,12 @@ allprojects {
  */
 
 ext {
+    httpClientVersion = '4.3.4'
     libraries = [
             jackson_databind: 'com.fasterxml.jackson.core:jackson-databind:2.3.3',
             lombok          : 'org.projectlombok:lombok:1.16.4',
             junit           : 'junit:junit:4.11',
+            http_client     : "org.apache.httpcomponents:httpclient:${httpClientVersion}",
     ]
 }
 

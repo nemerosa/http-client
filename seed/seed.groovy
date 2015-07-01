@@ -50,7 +50,7 @@ build
         }
     }
     publishers {
-        archiveJunit("**/build/test-results/*.xml")
+        // TODO archiveJunit("**/build/test-results/*.xml")
         tasks(
                 '**/*.java,**/*.groovy,**/*.xml,**/*.html,**/*.js',
                 '**/build/**,seed/**',
