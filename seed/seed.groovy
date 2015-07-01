@@ -94,7 +94,6 @@ uploadArchives
 --info
 --stacktrace
 --profile
---parallel
 --console=plain
 '''
             gradle '''\
