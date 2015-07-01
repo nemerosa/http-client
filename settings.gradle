@@ -1,0 +1,4 @@
+rootProject.name = 'http-client'
+
+include ':http-client-core'
+// TODO include ':http-client-json'
