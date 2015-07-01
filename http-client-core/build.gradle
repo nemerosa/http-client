@@ -1,7 +1,9 @@
 description = "Wrapper on top of the Apache HTTP Client to provide high level methods."
 
 dependencies {
+    compile libraries.commons_lang3
     compile libraries.http_client
+    compile libraries.http_mime
     compile libraries.slf4j_api
     compile libraries.lombok
 }
