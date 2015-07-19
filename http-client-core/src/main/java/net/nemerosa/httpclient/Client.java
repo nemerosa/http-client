@@ -7,6 +7,7 @@ import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.CloseableHttpClient;
 
 import java.net.URL;
+import java.util.Map;
 
 public interface Client {
 
@@ -21,6 +22,16 @@ public interface Client {
     <T> T put(ResponseParser<T> responseParser, HttpEntity data, String path, Object... parameters);
 
     <T> T upload(ResponseParser<T> responseParser, String name, Document file, String fileName, String path, Object... parameters);
+
+    /**
+     * With some headers
+     */
+    Client withHeader(String name, String value);
+
+    /**
+     * With some headers
+     */
+    Client withHeaders(Map<String, String> headers);
 
     /**
      * Downloads a document

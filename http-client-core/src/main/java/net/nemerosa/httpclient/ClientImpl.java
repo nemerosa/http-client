@@ -11,6 +11,8 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collections;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import static java.lang.String.format;
@@ -23,9 +25,15 @@ public class ClientImpl implements Client {
     private final Supplier<CloseableHttpClient> httpClientSupplier;
     private final HttpClientContext httpContext;
     private final ClientLogger clientLogger;
+    private final Map<String, String> headers;
 
     public ClientImpl(URL url, HttpHost host, Supplier<CloseableHttpClient> httpClientSupplier, HttpClientContext httpContext, ClientLogger clientLogger) {
+        this(url, Collections.emptyMap(), host, httpClientSupplier, httpContext, clientLogger);
+    }
+
+    public ClientImpl(URL url, Map<String, String> headers, HttpHost host, Supplier<CloseableHttpClient> httpClientSupplier, HttpClientContext httpContext, ClientLogger clientLogger) {
         this.url = url;
+        this.headers = headers;
         this.host = host;
         this.httpClientSupplier = httpClientSupplier;
         this.httpContext = httpContext;
@@ -100,6 +108,23 @@ public class ClientImpl implements Client {
     }
 
     @Override
+    public Client withHeader(String name, String value) {
+        return withHeaders(Collections.singletonMap(name, value));
+    }
+
+    @Override
+    public Client withHeaders(Map<String, String> headers) {
+        return new ClientImpl(
+                this.url,
+                headers,
+                this.host,
+                this.httpClientSupplier,
+                this.httpContext,
+                this.clientLogger
+        );
+    }
+
+    @Override
     public Document download(String path, Object... parameters) {
         HttpGet get = new HttpGet(getUrl(path));
         return request(get, (request, response, entity) -> {
@@ -147,6 +172,8 @@ public class ClientImpl implements Client {
 
     protected <T> T request(HttpRequestBase request, ResponseHandler<T> responseHandler) {
         clientLogger.trace("[request] " + request);
+        // Headers
+        headers.forEach(request::setHeader);
         // Executes the call
         try {
             try (CloseableHttpClient http = httpClientSupplier.get()) {
