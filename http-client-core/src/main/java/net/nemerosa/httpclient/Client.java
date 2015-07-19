@@ -54,4 +54,9 @@ public interface Client {
      * HTTP call context
      */
     HttpClientContext getHttpClientContext();
+
+    /**
+     * Gets the logger
+     */
+    ClientLogger getClientLogger();
 }

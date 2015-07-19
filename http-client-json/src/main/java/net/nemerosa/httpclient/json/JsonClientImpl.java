@@ -12,18 +12,29 @@ import org.apache.http.entity.StringEntity;
 
 import java.io.IOException;
 
+@SuppressWarnings("unused")
 public class JsonClientImpl implements JsonClient {
 
     private final Client httpClient;
     private final ObjectMapper objectMapper;
+    private final boolean logJson;
 
-    public JsonClientImpl(Client httpClient, ObjectMapper objectMapper) {
+    public JsonClientImpl(Client httpClient, ObjectMapper objectMapper, boolean logJson) {
         this.httpClient = httpClient;
         this.objectMapper = objectMapper;
+        this.logJson = logJson;
+    }
+
+    public JsonClientImpl(Client httpClient, ObjectMapper objectMapper) {
+        this(httpClient, objectMapper, false);
+    }
+
+    public JsonClientImpl(Client httpClient, boolean logJson) {
+        this(httpClient, new ObjectMapper(), logJson);
     }
 
     public JsonClientImpl(Client httpClient) {
-        this(httpClient, new ObjectMapper());
+        this(httpClient, new ObjectMapper(), false);
     }
 
     @Override
@@ -42,7 +53,7 @@ public class JsonClientImpl implements JsonClient {
             return httpClient.post(
                     this::toJson,
                     new StringEntity(
-                            objectMapper.writeValueAsString(data),
+                            toJsonRequest(data),
                             ContentType.create("application/json", "UTF-8")
                     ),
                     path,
@@ -59,7 +70,7 @@ public class JsonClientImpl implements JsonClient {
             return httpClient.put(
                     this::toJson,
                     new StringEntity(
-                            objectMapper.writeValueAsString(data),
+                            toJsonRequest(data),
                             ContentType.create("application/json", "UTF-8")
                     ),
                     path,
@@ -68,6 +79,19 @@ public class JsonClientImpl implements JsonClient {
         } catch (JsonProcessingException e) {
             throw new JsonClientMappingException(e);
         }
+    }
+
+    private String toJsonRequest(Object data) throws JsonProcessingException {
+        String json = objectMapper.writeValueAsString(data);
+        if (logJson) {
+            httpClient.getClientLogger().trace(
+                    String.format(
+                            "[request][json]\n%s",
+                            json
+                    )
+            );
+        }
+        return json;
     }
 
     @Override
@@ -87,10 +111,16 @@ public class JsonClientImpl implements JsonClient {
 
     private JsonNode toJson(String content) {
         if (StringUtils.isBlank(content)) {
+            if (logJson) {
+                httpClient.getClientLogger().trace("[response][json] No content");
+            }
             return new ObjectNode(objectMapper.getNodeFactory());
         } else {
             JsonNode tree;
             try {
+                if (logJson) {
+                    httpClient.getClientLogger().trace(String.format("[response][json]\n%s", content));
+                }
                 tree = objectMapper.readTree(content);
             } catch (IOException e) {
                 throw new JsonClientParsingException(e);

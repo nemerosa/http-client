@@ -170,6 +170,11 @@ public class ClientImpl implements Client {
         return httpContext;
     }
 
+    @Override
+    public ClientLogger getClientLogger() {
+        return clientLogger;
+    }
+
     protected <T> T request(HttpRequestBase request, ResponseHandler<T> responseHandler) {
         clientLogger.trace("[request] " + request);
         // Headers
