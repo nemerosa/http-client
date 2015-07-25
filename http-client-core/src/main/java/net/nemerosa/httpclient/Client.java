@@ -24,6 +24,18 @@ public interface Client {
     <T> T upload(ResponseParser<T> responseParser, String name, Document file, String fileName, String path, Object... parameters);
 
     /**
+     * Uploads a document.
+     *
+     * @param responseParser Parser for the response
+     * @param file           Document to upload
+     * @param path           Path to upload to
+     * @param parameters     Parameters for the path
+     * @param <T>            Type of the response
+     * @return Parsed response
+     */
+    <T> T upload(ResponseParser<T> responseParser, Document file, String path, Object... parameters);
+
+    /**
      * With some headers
      */
     Client withHeader(String name, String value);

@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.*;
 import org.apache.http.client.methods.*;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -103,6 +104,18 @@ public class ClientImpl implements Client {
                         )
                         .build()
         );
+        // OK
+        return request(post, responseParser);
+    }
+
+    @Override
+    public <T> T upload(ResponseParser<T> responseParser, Document file, String path, Object... parameters) {
+        HttpPost post = new HttpPost(getUrl(path));
+        // Binary content
+        ByteArrayEntity entity = new ByteArrayEntity(file.getContent());
+        entity.setContentType(file.getType());
+        // Sets the content
+        post.setEntity(entity);
         // OK
         return request(post, responseParser);
     }
