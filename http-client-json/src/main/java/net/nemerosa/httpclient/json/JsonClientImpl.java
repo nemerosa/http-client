@@ -100,6 +100,11 @@ public class JsonClientImpl implements JsonClient {
     }
 
     @Override
+    public JsonNode upload(Document file, String path, Object... parameters) {
+        return httpClient.upload(this::toJson, file, path, parameters);
+    }
+
+    @Override
     public Document download(String path, Object... parameters) {
         return httpClient.download(path, parameters);
     }
