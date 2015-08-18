@@ -6,4 +6,7 @@ dependencies {
     compile libraries.http_mime
     compile libraries.slf4j_api
     compile libraries.lombok
+
+    testCompile libraries.junit
+    testCompile libraries.mockito
 }
