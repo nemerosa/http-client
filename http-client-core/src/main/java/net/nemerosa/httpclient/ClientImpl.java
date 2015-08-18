@@ -11,7 +11,9 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -54,10 +56,12 @@ public class ClientImpl implements Client {
             if (!formattedPath.startsWith("/")) {
                 formattedPath = "/" + formattedPath;
             }
-            return format(
-                    "%s%s",
-                    stripEnd(url.toString(), "/"),
-                    formattedPath
+            return encode(
+                    format(
+                            "%s%s",
+                            stripEnd(url.toString(), "/"),
+                            formattedPath
+                    )
             );
         }
     }
@@ -254,15 +258,23 @@ public class ClientImpl implements Client {
         return EntityUtils.toString(response.getEntity(), "UTF-8");
     }
 
+    private static String encode(String name) {
+        try {
+            return URLEncoder.encode(name, "UTF-8").replace("+", "%20");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("Cannot encode URL", e);
+        }
+    }
+
     @FunctionalInterface
-    protected static interface EntityParser<T> {
+    protected interface EntityParser<T> {
 
         T parse(HttpEntity entity) throws IOException;
 
     }
 
     @FunctionalInterface
-    protected static interface ResponseHandler<T> {
+    protected interface ResponseHandler<T> {
 
         T handleResponse(HttpRequestBase request, HttpResponse response, HttpEntity entity) throws ParseException, IOException;
 
