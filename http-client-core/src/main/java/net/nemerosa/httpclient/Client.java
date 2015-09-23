@@ -50,7 +50,26 @@ public interface Client {
      */
     Document download(String path, Object... parameters);
 
+    /**
+     * Low level call which allows to deal with the response content, after the return codes
+     * have been processed.
+     *
+     * @param request        Request to send
+     * @param responseParser Parser for the response
+     * @param <T>            Type of object to return
+     * @return Return
+     */
     <T> T request(HttpRequestBase request, final ResponseParser<T> responseParser);
+
+    /**
+     * Low level call which allows to deal with the response directly, without any preprocessing.
+     *
+     * @param request         Request to send
+     * @param responseHandler Handler for the response
+     * @param <T>             Type of object to return
+     * @return Return
+     */
+    <T> T call(HttpRequestBase request, ResponseHandler<T> responseHandler);
 
     /**
      * Underlying HTTP client

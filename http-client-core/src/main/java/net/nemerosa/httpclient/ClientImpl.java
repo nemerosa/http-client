@@ -1,7 +1,9 @@
 package net.nemerosa.httpclient;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.*;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.*;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.ByteArrayEntity;
@@ -141,7 +143,7 @@ public class ClientImpl implements Client {
     @Override
     public Document download(String path, Object... parameters) {
         HttpGet get = new HttpGet(getUrl(path));
-        return request(get, (request, response, entity) -> {
+        return call(get, (request, response, entity) -> {
             // Gets the content as bytes
             byte[] bytes = EntityUtils.toByteArray(entity);
             if (bytes == null || bytes.length == 0) {
@@ -157,15 +159,14 @@ public class ClientImpl implements Client {
 
     @Override
     public <T> T request(HttpRequestBase request, final ResponseParser<T> responseParser) {
-        return request(
+        return call(
                 request,
-                (request1, response, entity) -> baseHandleResponse(request1, response, entity,
-                        entity1 -> {
-                            // Gets the content as a string
-                            String content = entity1 != null ? EntityUtils.toString(entity1, "UTF-8") : null;
-                            // Parses the response
-                            return responseParser.parse(content);
-                        })
+                new BaseResponseHandler<>(entity -> {
+                    // Gets the content as a string
+                    String content = entity != null ? EntityUtils.toString(entity, "UTF-8") : null;
+                    // Parses the response
+                    return responseParser.parse(content);
+                })
         );
     }
 
@@ -189,7 +190,8 @@ public class ClientImpl implements Client {
         return clientLogger;
     }
 
-    protected <T> T request(HttpRequestBase request, ResponseHandler<T> responseHandler) {
+    @Override
+    public <T> T call(HttpRequestBase request, ResponseHandler<T> responseHandler) {
         clientLogger.trace("[request] " + request);
         // Headers
         headers.forEach(request::setHeader);
@@ -213,63 +215,8 @@ public class ClientImpl implements Client {
         }
     }
 
-    protected <T> T baseHandleResponse(HttpRequestBase request, HttpResponse response, HttpEntity entity,
-                                       EntityParser<T> entityParser) throws ParseException, IOException {
-        // Parses the response
-        int statusCode = response.getStatusLine().getStatusCode();
-        if (statusCode == HttpStatus.SC_OK ||
-                statusCode == HttpStatus.SC_CREATED ||
-                statusCode == HttpStatus.SC_ACCEPTED) {
-            return entityParser.parse(entity);
-        } else if (statusCode == HttpStatus.SC_BAD_REQUEST) {
-            throw new ClientValidationException(getMessage(response));
-        } else if (statusCode == HttpStatus.SC_UNAUTHORIZED) {
-            throw new ClientCannotLoginException(request);
-        } else if (statusCode == HttpStatus.SC_FORBIDDEN) {
-            throw new ClientForbiddenException(request);
-        } else if (statusCode == HttpStatus.SC_NOT_FOUND) {
-            throw new ClientNotFoundException(getMessage(response));
-        } else if (statusCode == HttpStatus.SC_NO_CONTENT) {
-            return null;
-        } else if (statusCode == HttpStatus.SC_INTERNAL_SERVER_ERROR) {
-            String content = getMessage(response);
-            if (StringUtils.isNotBlank(content)) {
-                throw new ClientMessageException(content);
-            } else {
-                // Generic error
-                throw new ClientServerException(
-                        request,
-                        statusCode,
-                        response.getStatusLine().getReasonPhrase());
-            }
-        } else {
-            // Generic error
-            throw new ClientServerException(
-                    request,
-                    statusCode,
-                    response.getStatusLine().getReasonPhrase());
-        }
-    }
-
-    private static String getMessage(HttpResponse response) throws IOException {
-        return EntityUtils.toString(response.getEntity(), "UTF-8");
-    }
-
     private static String encode(String name) {
         return name.replace(" ", "%20");
     }
 
-    @FunctionalInterface
-    protected interface EntityParser<T> {
-
-        T parse(HttpEntity entity) throws IOException;
-
-    }
-
-    @FunctionalInterface
-    protected interface ResponseHandler<T> {
-
-        T handleResponse(HttpRequestBase request, HttpResponse response, HttpEntity entity) throws ParseException, IOException;
-
-    }
 }
