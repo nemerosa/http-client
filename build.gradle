@@ -132,8 +132,10 @@ if (project.hasProperty('release')) {
 }
 
 nexusStaging {
+    packageGroup = 'net.nemerosa'
     username = ossrhUser
     password = ossrhPassword
+    numberOfRetries = 30
 }
 
 /**
