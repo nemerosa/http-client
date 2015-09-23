@@ -1,9 +1,15 @@
 package net.nemerosa.httpclient.json;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import net.nemerosa.httpclient.Client;
 import net.nemerosa.httpclient.Document;
 
 public interface JsonClient {
+
+    /**
+     * Underlying client
+     */
+    Client getClient();
 
     JsonNode toNode(Object data);
 

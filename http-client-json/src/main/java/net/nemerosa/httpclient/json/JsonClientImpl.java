@@ -110,6 +110,11 @@ public class JsonClientImpl implements JsonClient {
     }
 
     @Override
+    public Client getClient() {
+        return httpClient;
+    }
+
+    @Override
     public JsonNode toNode(Object data) {
         return objectMapper.valueToTree(data);
     }
