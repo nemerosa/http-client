@@ -12,7 +12,7 @@ Using Gradle:
 
 ```groovy
 dependencies {
-   compile 'net.nemerosa:http-client-core:1.0.0'
+   compile 'net.nemerosa:http-client-core:1.4.1'
 }
 ```
 
@@ -20,7 +20,7 @@ or:
 
 ```groovy
 dependencies {
-   compile 'net.nemerosa:http-client-json:1.0.0'
+   compile 'net.nemerosa:http-client-json:1.4.1'
 }
 ```
 
